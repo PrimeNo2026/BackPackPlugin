@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,8 +25,15 @@ jobs:
         run: mvn -B package
         working-directory: BackpackPlugin
 
-      - name: Jar hochladen
+      - name: Jar hochladen (Artifact)
         uses: actions/upload-artifact@v4
         with:
           name: BackpackPlugin-jar
           path: BackpackPlugin/target/BackpackPlugin-*.jar
+
+      - name: Release mit .jar veroeffentlichen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          files: BackpackPlugin/target/BackpackPlugin-*.jar
